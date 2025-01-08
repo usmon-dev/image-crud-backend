@@ -51,7 +51,7 @@ export const getImageById = async (
     const { id } = req.params;
     const image = await getDoc(doc(imageCollection, id));
     if (!image.exists()) {
-      res.status(404).json("Image not found");
+      res.status(404).json({ message: "No images found" });
     } else {
       res.status(200).json({ id: image.id, ...image.data() });
     }
@@ -65,7 +65,7 @@ export const addImage = async (req: Request, res: Response): Promise<void> => {
     const { image } = req.body;
     const newImage = { image, createdAt: getFormattedDateAndTime() };
     await addDoc(imageCollection, newImage).then(() => {
-      res.status(201).json("Image added successfully");
+      res.status(201).json({ message: "Image created successfully" });
     });
   } catch (error) {
     console.log(error);
@@ -80,9 +80,14 @@ export const updateImage = async (
     const { id } = req.params;
     const { image } = req.body;
     const imageRef = doc(imageCollection, id);
-    await updateDoc(imageRef, { image }).then(() => {
-      res.status(200).json("Image updated successfully");
-    });
+    const imageDoc = await getDoc(imageRef);
+    if (imageDoc.exists()) {
+      await updateDoc(imageRef, { image }).then(() => {
+        res.status(200).json({ message: "Image updated successfully" });
+      });
+    } else {
+      res.status(404).json({ message: "No images found" });
+    }
   } catch (error) {
     console.log(error);
   }
@@ -94,9 +99,15 @@ export const deleteImage = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    await deleteDoc(doc(imageCollection, id)).then(() => {
-      res.status(200).json("Image deleted successfully");
-    });
+    const imageRef = doc(imageCollection, id);
+    const imageDoc = await getDoc(imageRef);
+    if (!imageDoc.exists()) {
+      res.status(404).json({ message: "No images found" });
+    } else {
+      await deleteDoc(imageRef).then(() => {
+        res.status(200).json({ message: "Image deleted successfully" });
+      });
+    }
   } catch (error) {
     console.log(error);
   }

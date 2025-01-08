@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start": "node src/index.ts",
-    "dev": "nodemon index.ts"
+    "start": "ts-node -r tsconfig-paths/register src/index.ts",
+    "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts"
   },
   "repository": {
     "type": "git",
