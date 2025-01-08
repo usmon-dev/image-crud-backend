@@ -13,7 +13,6 @@ import {
   orderBy,
   arrayUnion,
 } from "firebase/firestore";
-import { log } from "console";
 import { getFormattedDateAndTime } from "../utilities/defaults";
 
 const imageCollection = collection(db, "images");
@@ -64,9 +63,40 @@ export const getImageById = async (
 export const addImage = async (req: Request, res: Response): Promise<void> => {
   try {
     const { image } = req.body;
-    const newImage = { image, createdAt: getFormattedDateAndTime };
-    await addDoc(imageCollection, newImage);
-    res.status(201).send("Image added successfully");
+    const newImage = { image, createdAt: getFormattedDateAndTime() };
+    await addDoc(imageCollection, newImage).then(() => {
+      res.status(201).send("Image added successfully");
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const updateImage = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { image } = req.body;
+    const imageRef = doc(imageCollection, id);
+    await updateDoc(imageRef, { image }).then(() => {
+      res.status(200).send("Image updated successfully");
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deleteImage = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    await deleteDoc(doc(imageCollection, id)).then(() => {
+      res.status(200).send("Image deleted successfully");
+    });
   } catch (error) {
     console.log(error);
   }
