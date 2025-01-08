@@ -14,3 +14,5 @@ router.get("/:id", getImageById);
 router.post("/", addImage);
 router.put("/:id", updateImage);
 router.delete("/:id", deleteImage);
+
+export default router;
